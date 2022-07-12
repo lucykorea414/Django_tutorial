@@ -2,3 +2,20 @@
 <div>
     {{ question.content }}
 </div>
+<h5>{{ question.answer_set.count }}개의 답변이 있습니다.</h5>
+<div>
+    <ul>
+    {% for answer in question.answer_set.all %}
+        <li>{{ answer.content }}</li>
+    {% endfor %}
+    </ul>
+</div>
+<form action="{% url 'pybo:answer_create' question.id %}" method="post">
+    {% csrf_token %}
+    <!-- 보안에 관련된 항목으로 form으로 전송한 데이터가 실제 웹 페이지에서 작성한 데이터인지를 판단하는 가늠자 역할을 한다
+    만약 어떤 해커가 이상한 방법으로 데이터를 전송할 경우에는 서버에서 발행한 csrf_token 값과 해커가 일방적으로 보낸 csrf_token 값이 일치하지 않기 때문에 블록킹될 것이다 
+    따라서 form 태그 바로 밑에 {% csrf_token %} 태그를 항상 위치시켜야 한다.
+    POST 요청시 form 태그에 csrf_token이 없으면 장고는 오류를 낸다. -->
+    <textarea name="content" id="content" rows="15"></textarea>
+    <input type="submit" value="답변등록">
+</form>
