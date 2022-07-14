@@ -1,24 +1,43 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-
-<h1>{{ question.subject }}</h1>
-<div>
-    {{ question.content }}
-</div>
-<h5>{{ question.answer_set.count }}개의 답변이 있습니다.</h5>
-<div>
-    <ul>
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+<div class="container my-3">
+    <!-- 질문 -->
+    <h2 class="border-bottom py-2">{{ question.subject }}</h2>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ question.content }}</div>
+            <div class="d-flex justify-content-end">
+                <div class="badge bg-light text-dark p-2">
+                    {{ question.create_date }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 답변 -->
+    <h5 class="border-bottom my-3 py-2">{{question.answer_set.count}}개의 답변이 있습니다.</h5>
     {% for answer in question.answer_set.all %}
-        <li>{{ answer.content }}</li>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ answer.content }}</div>
+            <div class="d-flex justify-content-end">
+                <div class="badge bg-light text-dark p-2">
+                    {{ answer.create_date }}
+                </div>
+            </div>
+        </div>
+    </div>
     {% endfor %}
-    </ul>
+    <!-- 답변 등록 -->
+    <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
+        {% csrf_token %}
+        <!-- 보안에 관련된 항목으로 form으로 전송한 데이터가 실제 웹 페이지에서 작성한 데이터인지를 판단하는 가늠자 역할을 한다
+        만약 어떤 해커가 이상한 방법으로 데이터를 전송할 경우에는 서버에서 발행한 csrf_token 값과 해커가 일방적으로 보낸 csrf_token 값이 일치하지 않기 때문에 블록킹될 것이다 
+        따라서 form 태그 바로 밑에 {% csrf_token %} 태그를 항상 위치시켜야 한다.
+        POST 요청시 form 태그에 csrf_token이 없으면 장고는 오류를 낸다. -->
+        <div class="mb-3">
+            <label for="content" class="form-label">답변내용</label>
+            <textarea name="content" id="content" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="답변등록" class="btn btn-primary">
+    </form>
 </div>
-<form action="{% url 'pybo:answer_create' question.id %}" method="post">
-    {% csrf_token %}
-    <!-- 보안에 관련된 항목으로 form으로 전송한 데이터가 실제 웹 페이지에서 작성한 데이터인지를 판단하는 가늠자 역할을 한다
-    만약 어떤 해커가 이상한 방법으로 데이터를 전송할 경우에는 서버에서 발행한 csrf_token 값과 해커가 일방적으로 보낸 csrf_token 값이 일치하지 않기 때문에 블록킹될 것이다 
-    따라서 form 태그 바로 밑에 {% csrf_token %} 태그를 항상 위치시켜야 한다.
-    POST 요청시 form 태그에 csrf_token이 없으면 장고는 오류를 낸다. -->
-    <textarea name="content" id="content" rows="15"></textarea>
-    <input type="submit" value="답변등록">
-</form>
